@@ -1,38 +1,56 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  const products = [{ id: 1, name: 'Keyboard' }, { id: 2, name: 'Mouse' }];
+router.get('/', async (req, res) => {
+  const filter = { isDeleted: false };
+  if (req.query.status) filter.status = req.query.status;
+  const products = await Product.find(filter);
   res.json({ success: true, data: products });
 });
 
-router.get('/:id', (req, res) => {
-  if (req.params.id === '999') {
-    return res.status(404).json({
-      success: false,
-      error: { message: 'Product not found', code: 'NOT_FOUND' }
-    });
+router.get('/:id', async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product || product.isDeleted) {
+    return res.status(404).json({ success: false, error: { message: 'Product not found', code: 'NOT_FOUND' } });
   }
-  const product = { id: req.params.id, name: 'Sample Product' };
   res.json({ success: true, data: product });
 });
 
-router.post('/', (req, res) => {
-  if (!req.body.name) {
-    return res.status(400).json({
-      success: false,
-      error: { message: 'Name is required', code: 'VALIDATION_ERROR' }
-    });
+const Product = require('../models/Product');
+
+router.post('/', async (req, res) => {
+  try {
+    const product = await Product.create(req.body);
+    res.status(201).json({ success: true, data: product });
+  } catch (err) {
+    res.status(400).json({ success: false, error: { message: err.message, code: 'VALIDATION_ERROR' } });
   }
-  res.status(201).json({ success: true, data: req.body });
 });
 
-router.put('/:id', (req, res) => {
-  res.json({ success: true, data: { id: req.params.id, ...req.body } });
+
+router.put('/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!product) {
+      return res.status(404).json({ success: false, error: { message: 'Product not found', code: 'NOT_FOUND' } });
+    }
+    res.json({ success: true, data: product });
+  } catch (err) {
+    res.status(400).json({ success: false, error: { message: err.message, code: 'VALIDATION_ERROR' } });
+  }
 });
 
-router.delete('/:id', (req, res) => {
-  res.status(204).send(); // 204 has no body by definition — no envelope here
+
+router.delete('/:id', async (req, res) => {
+  const product = await Product.findByIdAndUpdate(req.params.id, { isDeleted: true });
+  if (!product) {
+    return res.status(404).json({ success: false, error: { message: 'Product not found', code: 'NOT_FOUND' } });
+  }
+  res.status(204).send();
 });
+
 
 module.exports = router;
