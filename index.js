@@ -44,4 +44,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/products', productsRouter);
+// app.use('/api/products', productsRouter);
+
+app.use('/api/v1/products', productsRouter);
