@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 exports.register = async (req, res) => {
@@ -16,6 +17,24 @@ exports.register = async (req, res) => {
   }
 };
 
+// Module 1 version — no token issued, kept for reference
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(401).json({ success: false, error: { message: 'Invalid credentials' } });
+//     }
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(401).json({ success: false, error: { message: 'Invalid credentials' } });
+//     }
+//     res.json({ success: true, data: { id: user._id, email: user.email } });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: { message: err.message } });
+//   }
+// };
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -27,7 +46,12 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ success: false, error: { message: 'Invalid credentials' } });
     }
-    res.json({ success: true, data: { id: user._id, email: user.email } });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+    res.json({ success: true, data: { token, user: { id: user._id, email: user.email } } });
   } catch (err) {
     res.status(400).json({ success: false, error: { message: err.message } });
   }
