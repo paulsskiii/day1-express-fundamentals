@@ -73,6 +73,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const productsRouter = require('./routes/products');
 const authRouter = require('./routes/auth');
+const tasksRouter = require('./routes/tasks');
 
 const app = express();
 connectDB();
@@ -86,6 +87,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/products', productsRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/tasks', tasksRouter);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT || 3000}`);
