@@ -91,6 +91,8 @@ app.use('/api/v1/tasks', tasksRouter);
 app.use('/api/v1/uploads', require('./routes/uploads'));
 app.use('/uploads', express.static('uploads'));
 
+app.use(require('./middleware/errorHandler'));
+
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT || 3000}`);
 });
