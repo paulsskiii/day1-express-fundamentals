@@ -93,6 +93,9 @@ app.use('/uploads', express.static('uploads'));
 
 app.use(require('./middleware/errorHandler'));
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on http://localhost:${process.env.PORT || 3000}`);
-});
+if (require.main === module) {
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT || 3000}`);
+  });
+}
+module.exports = app;
