@@ -21,7 +21,7 @@ async function seed() {
 
   const categoryIds = {};
   for (const name of ['Accessories', 'Apparel', 'Home']) {
-    const category = await Category.findOneAndUpdate({ name }, { name }, { upsert: true, new: true });
+    const category = await Category.findOneAndUpdate({ name }, { name }, { upsert: true, returnDocument: 'after' });
     categoryIds[name] = category._id;
   }
 
