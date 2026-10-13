@@ -91,6 +91,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
+    note: 'deployed from git',
     version: require('./package.json').version,
     uptime: Math.round(process.uptime()),
   });
