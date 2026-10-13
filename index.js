@@ -69,6 +69,7 @@
 // app.use('/api/v1/products', productsRouter);
 
 require('dotenv').config();
+require('./config/env')();
 const express = require('express');
 const connectDB = require('./config/db');
 require('./models/Category');
@@ -77,6 +78,7 @@ const authRouter = require('./routes/auth');
 const tasksRouter = require('./routes/tasks');
 
 const app = express();
+app.set('trust proxy', 1);
 connectDB();
 
 app.use(express.json());
@@ -84,6 +86,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} — ${req.method} ${req.url}`);
   next();
+});
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    version: require('./package.json').version,
+    uptime: Math.round(process.uptime()),
+  });
 });
 
 app.use('/api/v1/products', productsRouter);

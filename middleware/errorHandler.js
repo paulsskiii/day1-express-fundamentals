@@ -4,10 +4,9 @@ function errorHandler(err, req, res, next) {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     statusCode = 400;
   }
-  res.status(statusCode).json({
-    success: false,
-    error: { message: err.message || 'Internal server error' },
-  });
+  const hideDetails = statusCode >= 500 && process.env.NODE_ENV === 'production';
+  const message = hideDetails ? 'Internal server error' : err.message || 'Internal server error';
+  res.status(statusCode).json({ success: false, error: { message } });
 }
 
 module.exports = errorHandler;

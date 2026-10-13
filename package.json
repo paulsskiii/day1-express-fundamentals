@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "jest --forceExit",
     "dev": "nodemon index.js",
+    "start": "node index.js",
     "seed": "node scripts/seed.js"
   },
   "keywords": [],
